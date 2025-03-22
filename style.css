@@ -1,0 +1,210 @@
+@font-face {
+  font-family: 'SevenSegment';
+  src: url('fonts/Seven Segment.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  --clock-x: 25%;    /* Move clock left/right */
+  --clock-y: 75%;    /* Move clock up/down */
+  --controls-x: 32%; /* Move controls left/right */
+  --controls-y: 75%; /* Move controls up/down */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* === Background Image (Desk) === */
+body {
+  height: 100vh;
+  background: url('Desk.jpg') no-repeat center center/cover;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* === Macputer Layer === */
+body::after {
+  content: "";
+  background: url('Macputer.png') no-repeat center center;
+  background-size: contain;
+  position: absolute;
+  top: -20%;
+  left: 70%;
+  transform: translateX(-30%);
+  width: 120vw;
+  height: 120vh;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 1;
+}
+
+/* === Cursor Trail === */
+.cursor-trail {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background-color: #00ff88;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.5;
+  filter: blur(2px);
+  animation: trail-fade 0.6s forwards;
+}
+
+@keyframes trail-fade {
+  0% { opacity: 0.8; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.3); }
+}
+
+/* === Digital Clock Container === */
+.clock-container {
+  position: absolute;
+  top: var(--clock-y);
+  left: var(--clock-x);
+  transform: translate(-50%, -50%);
+  width: 1200px;
+  height: auto;
+  z-index: 2;
+}
+
+/* === Clock Image === */
+.clock-image {
+  width: 100%;
+  display: block;
+  position: relative;
+}
+
+/* === Timer Display (00:00) === */
+.timer-display {
+  font-size: 6rem;
+  position: absolute;
+  top: 51%;
+  left: 39%;
+  transform: translate(-50%, -50%);
+  font-family: 'SevenSegment', monospace;
+  color: #00ff88;
+  text-shadow: 0 0 10px rgba(0, 255, 100, 0.4);
+  letter-spacing: 0.2em;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* === Controls: Timer Inputs & Buttons === */
+.controls {
+  position: absolute;
+  top: var(--controls-y);
+  left: var(--controls-x);
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.controls input {
+  width: 80px;
+  padding: 12px;
+  text-align: center;
+  font-size: 1.5rem;
+  font-family: 'SevenSegment', monospace;
+  border: 2px solid #00ff88;
+  border-radius: 10px;
+  margin: 20px;
+  background-color: black;
+  color: #00ff88;
+  text-shadow: 0 0 8px rgba(0, 255, 100, 0.8);
+  box-shadow: 0 4px 8px rgba(0, 255, 100, 0.3);
+  outline: none;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.controls input:focus {
+  background-color: #111;
+  transform: scale(1.1);
+}
+
+.controls button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  font-family: 'SevenSegment', monospace;
+  text-transform: uppercase;
+  background-color: black;
+  color: #00ff88;
+  border: 2px solid #00ff88;
+  text-shadow: 0 0 8px rgba(0, 255, 100, 0.8);
+  box-shadow: 0 4px 8px rgba(0, 255, 100, 0.3);
+  cursor: pointer;
+  margin: 10px;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.controls button:hover {
+  background-color: #0097a7;
+}
+
+/* === Recent Timers Sidebar === */
+.recent-timers {
+  position: absolute;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  z-index: 4;
+}
+
+.timer-bubble {
+  width: 60px;
+  height: 60px;
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: opacity 0.5s ease;
+  animation: sway 4s ease-in-out infinite;
+}
+
+.timer-bubble.pop-out {
+  animation: pop 0.4s forwards ease-out;
+}
+
+/* === Animations === */
+@keyframes sway {
+  0%   { transform: rotate(0deg) translateY(0); }
+  20%  { transform: rotate(4deg) translateY(-6px); }
+  50%  { transform: rotate(0deg) translateY(0); }
+  80%  { transform: rotate(-4deg) translateY(6px); }
+  100% { transform: rotate(0deg) translateY(0); }
+}
+
+@keyframes pop {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.7; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+
+
+
+
+

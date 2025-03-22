@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Countdown Timer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="clock-container">
+    <img src="Digitalclock.png" alt="Clock" class="clock-image">
+    <div class="timer-display" id="timer">00:00</div>
+  </div>
+
+  <div class="controls">
+   <div class="input-group"> <!-- Add this wrapper -->
+     <input type="number" id="minutes" placeholder="Min" min="0" max="99" />
+     <input type="number" id="seconds" placeholder="Sec" min="0" max="59" />
+  </div>
+   <div>
+     <button onclick="startTimer()">Start</button>
+     <button onclick="pauseTimer()">Pause</button>
+     <button onclick="resetTimer()">Reset</button>
+  </div>
+  </div>
+
+  <!-- Recent timers sidebar -->
+  <div class="recent-timers" id="recentTimers"></div>
+
+  <!-- Sounds -->
+  <audio id="pop-sound" src="bubblepop.wav" preload="auto"></audio>
+  <audio id="ding-sound" src="Alarm.flac" preload="auto"></audio>
+  <audio id="click-sound" src="buttonpress.wav" preload="auto"></audio> <!-- 🔊 New sound -->
+
+  <script>
+  const timerDisplay = document.getElementById("timer");
+  const minutesInput = document.getElementById("minutes");
+  const secondsInput = document.getElementById("seconds");
+  const popSound = document.getElementById("pop-sound");
+  const dingSound = document.getElementById("ding-sound");
+  const clickSound = document.getElementById("click-sound");
+
+  let countdown;
+  let timeLeft = 0;
+  let paused = false;
+
+  function playClick() {
+    clickSound.currentTime = 0;
+    clickSound.play();
+  }
+
+  function updateDisplay() {
+    const min = Math.floor(timeLeft / 60);
+    const sec = timeLeft % 60;
+    timerDisplay.textContent = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+  }
+
+  function tick() {
+    if (timeLeft <= 0) {
+      clearInterval(countdown);
+      paused = true;
+      // Play alarm twice
+      dingSound.currentTime = 0;
+      dingSound.play();
+      setTimeout(() => {
+        dingSound.currentTime = 0;
+        dingSound.play();
+      }, 1025);
+      return;
+    }
+    timeLeft--;
+    updateDisplay();
+  }
+
+  function startTimer() {
+    playClick();
+
+    // Resume if paused
+    if (paused && timeLeft > 0) {
+      paused = false;
+      clearInterval(countdown);
+      countdown = setInterval(tick, 1000);
+      return;
+    }
+
+    const min = parseInt(minutesInput.value) || 0;
+    const sec = parseInt(secondsInput.value) || 0;
+    const total = min * 60 + sec;
+    if (total <= 0) return;
+
+    timeLeft = total;
+    paused = false;
+    addToRecentTimers(min, sec);
+
+    clearInterval(countdown);
+    countdown = setInterval(tick, 1000);
+    updateDisplay();
+  }
+
+  function startTimerFromString(timeString) {
+    const [minStr, secStr] = timeString.split(":");
+    const min = parseInt(minStr);
+    const sec = parseInt(secStr);
+    const total = min * 60 + sec;
+
+    if (total <= 0) return;
+
+    timeLeft = total;
+    paused = false;
+    clearInterval(countdown);
+    countdown = setInterval(tick, 1000);
+    updateDisplay();
+  }
+
+  function pauseTimer() {
+    playClick();
+    paused = true;
+    clearInterval(countdown);
+  }
+
+  function resetTimer() {
+    playClick();
+    clearInterval(countdown);
+    timeLeft = 0;
+    paused = false;
+    minutesInput.value = "";
+    secondsInput.value = "";
+    updateDisplay();
+  }
+
+  function addToRecentTimers(min, sec) {
+    const recentContainer = document.getElementById("recentTimers");
+    const bubble = document.createElement("div");
+    bubble.classList.add("timer-bubble");
+    bubble.textContent = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+
+    bubble.addEventListener("click", () => {
+      popSound.currentTime = 0;
+      popSound.play();
+      bubble.classList.add("pop-out");
+      setTimeout(() => {
+        startTimerFromString(bubble.textContent);
+        bubble.remove();
+      }, 400);
+    });
+
+    recentContainer.prepend(bubble);
+
+    const bubbles = recentContainer.querySelectorAll(".timer-bubble");
+    if (bubbles.length > 5) {
+      const oldBubble = bubbles[bubbles.length - 1];
+      popSound.currentTime = 0;
+      popSound.play();
+      oldBubble.classList.add("pop-out");
+      setTimeout(() => oldBubble.remove(), 400);
+    }
+  }
+
+  updateDisplay();
+
+  document.addEventListener("mousemove", (e) => {
+    const trail = document.createElement("div");
+    trail.className = "cursor-trail";
+    trail.style.left = `${e.clientX}px`;
+    trail.style.top = `${e.clientY}px`;
+    document.body.appendChild(trail);
+    setTimeout(() => trail.remove(), 600);
+  });
+</script>
+
+</body>
+</html>
